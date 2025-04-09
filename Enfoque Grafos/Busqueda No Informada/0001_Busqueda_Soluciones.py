@@ -42,7 +42,36 @@ class Problema:
         if accion.nombre not in acciones_estado.keys():
             return None
         return acciones_estado[accion.nombre]
+
+
+# %% Nodo
+class Nodo:
+    def __innit__(self, estado, accion=None, acciones=None, padre=None):
+        self.estado = estado
+        self.accion = accion
+        self.acciones = acciones
+        self.padre = padre
+        self.hijos = []
+
+    def __str__(self):
+        return self.estado.nombre
     
+    def expandir(self, problema):
+        self.hijos = []
+        if not self.acciones:
+            if self.estado.nombre not in problema.acciones.keys():
+                return self.hijos
+            self.acciones = problema.acciones[self.estado.nombre]
+        for accion in self.acciones.keys():
+            accion_hijo = Accion(accion)
+            nuevo_estado = problema.resultado(self.estado, accion_hijo)
+            acciones_nuevo = {}
+            if nuevo_estado in problema.acciones.keys():
+                acciones_nuevo = problema.acciones[nuevo_estado.nombre]
+            hijo = Nodo(nuevo:estado, accion_hijo, acciones_nuevo, self)
+            self.hijos.append(hijo)
+        return self.hijos
+
 
 # %% Definiciones
 if __name__ == '__main__':
