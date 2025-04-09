@@ -47,3 +47,42 @@ class Problema:
 # %% Definiciones
 if __name__ == '__main__':
     accN = Accion('norte')
+    accS = Accion('sur')
+    accE = Accion('este')
+    accO = Accion('oeste')
+
+    coruna = Estado('A Coruña', [accS, accE])
+    bilbao = Estado('Bilbao', [accS, accE])
+    barcelona = Estado('Barcelona', [accS, accO])
+    lisboa = Estado('Lisboa', [accN, accS, accE])
+    madrid = Estado('Madrid', [accN, accS, accE, accO])
+    valencia = Estado('Valencia', [accN, accS, accO])
+    faro = Estado('Faro', [accN, accE])
+    sevilla = Estado('Sevilla', [accN, accE, accO])
+    granada = Estado('Granada', [accN, accO])
+
+    viajes = {  'A Coruña': {'sur': lisboa, 
+                             'este': bilbao},
+                'Bilbao': {'sur': madrid, 
+                           'este': barcelona, 
+                           'oeste': coruna},
+                'Barcelona': {'sur': valencia, 
+                              'oeste': bilbao},
+                'Lisboa': {'norte': coruna, 
+                           'sur': faro, 
+                           'este': madrid},
+                'Madrid': {'norte': bilbao, 
+                           'sur': sevilla, 
+                           'este': valencia, 
+                           'oeste': lisboa},
+                'Valencia': {'norte': barcelona, 
+                             'sur': granada, 
+                             'oeste': madrid},
+                'Faro': {'norte': lisboa, 
+                         'este': sevilla},
+                'Sevilla': {'norte': madrid, 
+                            'este': granada, 
+                            'oeste': faro},
+                'Granada': {'norte': valencia, 
+                            'oeste': sevilla}
+            }
