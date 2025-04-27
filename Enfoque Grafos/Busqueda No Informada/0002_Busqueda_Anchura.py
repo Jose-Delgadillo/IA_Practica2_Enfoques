@@ -1,5 +1,5 @@
 """
-Prácticas de Inteligencia artificial
+Prácticas de Inteligencia Artificial
 Ejemplos de Busqueda en Anchura
 """
 from collections import deque

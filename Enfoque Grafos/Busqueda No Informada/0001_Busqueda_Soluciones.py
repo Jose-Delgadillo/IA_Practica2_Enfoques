@@ -1,5 +1,5 @@
 """
-Prácticas de Inteligencia artificial
+Prácticas de Inteligencia Artificial
 Ejemplos de estructura de datos para busqueda en grafos.
 """
 # %% Acción

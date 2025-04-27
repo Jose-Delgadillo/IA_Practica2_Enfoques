@@ -1,3 +1,7 @@
+"""
+Prácticas de Inteligencia Artificial
+Ejemplos de Búsqueda en Profundidad 
+"""
 def busqueda_en_profundidad(grafo, inicio, objetivo):
     # Usamos una pila (LIFO) para mantener los nodos pendientes
     pila = [(inicio, [inicio])]  # Cada tupla contiene el nodo actual y el camino

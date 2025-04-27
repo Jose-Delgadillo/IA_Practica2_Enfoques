@@ -1,5 +1,5 @@
 """
-Prácticas de Inteligencia artificial
+Prácticas de Inteligencia Artificial
 Ejemplos de Búsqueda en Profundidad Limitada
 """
 def busqueda_profundidad_limitada(grafo, inicio, objetivo, limite):

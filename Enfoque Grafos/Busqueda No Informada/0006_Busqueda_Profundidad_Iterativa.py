@@ -1,5 +1,5 @@
 """
-Prácticas de Inteligencia artificial
+Prácticas de Inteligencia Artificial
 Ejemplos de Búsqueda en Profundidad Iterativa
 """
 def busqueda_profundidad_limitada(grafo, nodo_actual, objetivo, limite):
@@ -38,3 +38,5 @@ objetivo = 'F'
 
 camino = busqueda_profundidad_iterativa(grafo, inicio, objetivo)
 print(f"Camino encontrado: {camino}")
+
+#Camino encontrado: ['A', 'C', 'F']

@@ -1,5 +1,5 @@
 """
-Prácticas de Inteligencia artificial
+Prácticas de Inteligencia Artificial
 Ejemplos de Búsqueda Bidireccional
 """
 from collections import deque
@@ -70,3 +70,5 @@ objetivo = 'F'
 
 camino = busqueda_bidireccional(grafo, inicio, objetivo)
 print(f"Camino encontrado: {camino}")
+
+#Camino encontrado: ['A', 'B', 'D', 'F']

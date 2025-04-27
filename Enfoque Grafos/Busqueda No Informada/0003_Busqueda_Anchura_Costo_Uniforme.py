@@ -1,5 +1,5 @@
 """
-Prácticas de Inteligencia artificial
+Prácticas de Inteligencia Artificial
 Ejemplos de Búsqueda en Anchura de Costo Uniforme
 """
 import heapq
