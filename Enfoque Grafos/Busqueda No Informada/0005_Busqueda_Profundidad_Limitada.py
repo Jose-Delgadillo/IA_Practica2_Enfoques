@@ -1,3 +1,7 @@
+"""
+Prácticas de Inteligencia artificial
+Ejemplos de Búsqueda en Profundidad Limitada
+"""
 def busqueda_profundidad_limitada(grafo, inicio, objetivo, limite):
     pila = [(inicio, [inicio], 0)]  # Nodo, Camino y Profundidad actual
     visitados = set()
