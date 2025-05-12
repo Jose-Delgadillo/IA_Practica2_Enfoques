@@ -136,3 +136,18 @@ solucion_ao = encontrar_solucion_ao_star(grafo_ao, heuristicas, inicio)
 print("\n===== Búsqueda AO* =====")
 for nodo, (hijos, costo) in solucion_ao.items():
     print(f"Nodo {nodo}: sigue a {hijos} con costo total {costo}")
+
+#Salidas
+#===== Búsqueda A* =====
+#Camino encontrado A*: ['A', 'B', 'E', 'F']
+#Costo total A*: 7
+
+#===== Búsqueda AO* =====
+#Nodo D: sigue a [] con costo total 2
+#Nodo B: sigue a ['D'] con costo total 6
+#Nodo E: sigue a [] con costo total 1
+#Nodo F: sigue a [] con costo total 0
+#Nodo C: sigue a ['E', 'F'] con costo total 5
+#Nodo A: sigue a ['B', 'C'] con costo total 17
+#Cuando tienen [] significa que ese nodo es un nodo terminal, es decir, no tiene más hijos que resolver
+#El costo total es simplemente su heurística, ya que no hay más pasos que dar.
