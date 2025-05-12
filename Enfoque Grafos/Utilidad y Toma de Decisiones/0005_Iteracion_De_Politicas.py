@@ -1,6 +1,6 @@
 """
 Prácticas de Inteligencia Artificial
-Iteración de Políticas en Procesos de Decisión de Markov (MDP)
+Iteración de Políticas en MDP
 
 Este algoritmo encuentra una política óptima para un entorno donde:
 - Los estados tienen transiciones probabilísticas.
