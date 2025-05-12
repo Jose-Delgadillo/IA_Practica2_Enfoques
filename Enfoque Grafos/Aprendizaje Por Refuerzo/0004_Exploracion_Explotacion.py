@@ -1,3 +1,21 @@
+"""
+Prácticas de Inteligencia Artificial
+Exploración vs. Explotación: Política Epsilon-Greedy
+
+En este programa se ilustra el concepto de exploración frente a explotación dentro del contexto de un agente de aprendizaje por refuerzo. 
+El agente tiene que balancear entre:
+
+1. **Exploración**: Elegir una acción aleatoria en el entorno para aprender más sobre él.
+2. **Explotación**: Elegir la acción que maximiza el valor esperado de la recompensa según lo aprendido hasta el momento.
+
+La política epsilon-greedy es una de las formas de manejar este dilema. Esta política dice que con una probabilidad **epsilon** (ε), el agente va a explorar (elegir una acción aleatoria), y con una probabilidad **(1 - epsilon)**, el agente va a explotar (elegir la acción con el mayor valor de Q).
+
+En este programa, un agente entrenado en un entorno simple actualizará su función de valor Q utilizando esta política. 
+
+El agente aprende a través de iteraciones y optimiza sus decisiones basadas en las recompensas obtenidas por cada acción tomada en cada estado.
+
+"""
+
 import random
 
 # Función para seleccionar la acción según la política epsilon-greedy
