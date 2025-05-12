@@ -38,7 +38,7 @@ def equilibrio_nash():
                 # Si jugador 2 no puede mejorar su resultado cambiando su jugada
                 if (jugada_2 == 'Cooperar' and resultado_2 >= jugar(jugada_1, 'Traicionar')[1]) or \
                    (jugada_2 == 'Traicionar' and resultado_2 >= jugar(jugada_1, 'Cooperar')[1]):
-                    print(f"Equilibrio de Nash encontrado: Jugador 1 elige {jugada_1}, Jugador 2 elige {jugada_2}")
+                    print(f"Equilibrio de Nash encontrado: \nJugador 1 elige {jugada_1} \nJugador 2 elige {jugada_2}")
                     return
 
 # Ejecutar la búsqueda del equilibrio de Nash
