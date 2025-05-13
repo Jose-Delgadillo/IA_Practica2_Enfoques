@@ -45,10 +45,17 @@ padres = {
 # Función para obtener la probabilidad condicional o marginal
 def probabilidad(variable, valor, asignacion):
     if padres[variable] == []:
+        # Si no tiene padres, se consulta directamente
         return P[variable][valor]
     else:
-        valores_padres = tuple(asignacion[p] for p in padres[variable])
-        return P[variable][valores_padres][valor]
+        # Si tiene padres, se obtienen sus valores
+        if len(padres[variable]) == 1:
+            valor_padre = asignacion[padres[variable][0]]
+            return P[variable][valor_padre][valor]
+        else:
+            valores_padres = tuple(asignacion[p] for p in padres[variable])
+            return P[variable][valores_padres][valor]
+
 
 # Enumeración recursiva
 def enumerar_todas(variables, asignacion):
