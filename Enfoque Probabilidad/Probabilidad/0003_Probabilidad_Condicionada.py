@@ -49,3 +49,7 @@ print(f"P(¬Fuego|Humo)      = {P_NoFuego_dado_Humo:.5f}")
 
 # Comprobación
 print(f"\nVerificación: P(Fuego|Humo) + P(¬Fuego|Humo) = {P_Fuego_dado_Humo + P_NoFuego_dado_Humo:.5f}")
+
+#P(Fuego|Humo)       = 0.08333
+#P(¬Fuego|Humo)      = 0.91667
+#Aunque la probabilidad de que haya fuego es solo del 1%, al detectar humo, la probabilidad sube a más del 8%.

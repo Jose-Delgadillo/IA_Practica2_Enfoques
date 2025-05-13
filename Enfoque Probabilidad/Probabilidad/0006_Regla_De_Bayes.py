@@ -34,3 +34,6 @@ print(f"P(Enfermedad) = {P_enfermedad}")
 print(f"P(Positivo | Enfermedad) = {P_positivo_dado_enfermedad}")
 print(f"P(Positivo | No Enfermedad) = {P_positivo_dado_no_enfermedad}")
 print(f"P(Positivo) = {P_positivo:.4f}")
+
+#Aunque el test es bastante preciso (99% de sensibilidad), la enfermedad es muy rara (1%), lo que hace que 
+# incluso un resultado positivo tenga una baja probabilidad real de indicar enfermedad (probablemente cerca del 16%).
