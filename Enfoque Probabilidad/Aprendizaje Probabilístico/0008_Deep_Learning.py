@@ -1,131 +1,110 @@
 """
 Prácticas de Inteligencia Artificial
-Aprendizaje Profundo (Deep Learning)
+Aprendizaje Profundo: Red Neuronal Feedforward (con Python puro)
 
-Este programa implementa una red neuronal simple con una capa oculta para clasificación binaria.
-El aprendizaje profundo utiliza redes neuronales con múltiples capas para modelar relaciones
-complejas en los datos. En este ejemplo, construimos y entrenamos la red desde cero usando NumPy,
-sin utilizar librerías especializadas, para entender el proceso fundamental del entrenamiento
-y la predicción en redes neuronales.
+Este programa implementa una red neuronal simple de una capa oculta, usando solo Python.
+No utiliza librerías externas como NumPy ni TensorFlow, lo que permite entender desde cero
+cómo funcionan las redes neuronales a bajo nivel.
+
+La red se entrena con el algoritmo de retropropagación (backpropagation) para resolver el
+problema lógico XOR, que no puede ser resuelto por una sola neurona.
+
+Entradas: dos valores binarios (0 o 1)
+Salida: un valor cercano a 0 o 1 dependiendo del resultado del XOR
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
+import random
+import math
 
-# ---------------------------
-# 1. Generación de datos
-# ---------------------------
-
-np.random.seed(42)
-n_samples = 200
-
-# Generamos datos para la clase 0 centrados en (-1, -1)
-X0 = np.random.randn(n_samples // 2, 2) - 1
-y0 = np.zeros(n_samples // 2)
-
-# Generamos datos para la clase 1 centrados en (1, 1)
-X1 = np.random.randn(n_samples // 2, 2) + 1
-y1 = np.ones(n_samples // 2)
-
-# Unimos los datos
-X = np.vstack([X0, X1])
-y = np.hstack([y0, y1])
-
-# Visualizamos los datos
-plt.scatter(X[:, 0], X[:, 1], c=y, cmap='bwr', alpha=0.7)
-plt.title("Datos de entrenamiento (clases 0 y 1)")
-plt.xlabel("Característica 1")
-plt.ylabel("Característica 2")
-plt.show()
-
-# ---------------------------
-# 2. Inicialización de la red neuronal
-# ---------------------------
-
-input_dim = 2
-hidden_dim = 4
-output_dim = 1
-
-# Inicializamos los pesos y sesgos
-W1 = np.random.randn(input_dim, hidden_dim) * 0.01
-b1 = np.zeros((1, hidden_dim))
-W2 = np.random.randn(hidden_dim, output_dim) * 0.01
-b2 = np.zeros((1, output_dim))
-
-# ---------------------------
-# 3. Funciones auxiliares
-# ---------------------------
-
+# Función de activación sigmoide
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    return 1 / (1 + math.exp(-x))
 
-def sigmoid_derivative(x):
-    s = sigmoid(x)
-    return s * (1 - s)
+# Derivada de la sigmoide (necesaria para backpropagation)
+def sigmoid_deriv(x):
+    sx = sigmoid(x)
+    return sx * (1 - sx)
 
-def forward(X, W1, b1, W2, b2):
-    Z1 = np.dot(X, W1) + b1
-    A1 = sigmoid(Z1)
-    Z2 = np.dot(A1, W2) + b2
-    A2 = sigmoid(Z2)
-    return Z1, A1, Z2, A2
+# Entradas y salidas esperadas del problema XOR
+datos_entrada = [
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1]
+]
 
-def compute_loss(y_true, y_pred):
-    m = y_true.shape[0]
-    epsilon = 1e-15
-    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
-    loss = -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
-    return loss
+salidas_esperadas = [
+    0,
+    1,
+    1,
+    0
+]
 
-def backward(X, y, Z1, A1, Z2, A2, W1, b1, W2, b2, learning_rate=0.1):
-    m = y.shape[0]
-    dZ2 = A2 - y.reshape(-1, 1)
-    dW2 = np.dot(A1.T, dZ2) / m
-    db2 = np.sum(dZ2, axis=0, keepdims=True) / m
+# Inicializamos pesos y sesgos con valores aleatorios pequeños
+def inicializar_pesos(filas, columnas):
+    return [[random.uniform(-1, 1) for _ in range(columnas)] for _ in range(filas)]
 
-    dA1 = np.dot(dZ2, W2.T)
-    dZ1 = dA1 * sigmoid_derivative(Z1)
-    dW1 = np.dot(X.T, dZ1) / m
-    db1 = np.sum(dZ1, axis=0, keepdims=True) / m
+def inicializar_bias(filas):
+    return [random.uniform(-1, 1) for _ in range(filas)]
 
-    # Actualizamos pesos y sesgos
-    W1 -= learning_rate * dW1
-    b1 -= learning_rate * db1
-    W2 -= learning_rate * dW2
-    b2 -= learning_rate * db2
+# Estructura de red: 2 entradas, 2 neuronas ocultas, 1 salida
+W1 = inicializar_pesos(2, 2)   # Pesos de entrada a capa oculta
+b1 = inicializar_bias(2)       # Bias de capa oculta
 
-    return W1, b1, W2, b2
+W2 = inicializar_pesos(2, 1)   # Pesos de capa oculta a salida
+b2 = inicializar_bias(1)       # Bias de salida
 
-# ---------------------------
-# 4. Entrenamiento de la red
-# ---------------------------
+# Hiperparámetros
+epocas = 10000
+tasa_aprendizaje = 0.5
 
-epochs = 1000
+# Entrenamiento
+for epoca in range(epocas):
+    error_total = 0
+    for x, y_esperado in zip(datos_entrada, salidas_esperadas):
+        # === Forward Pass ===
+        # Capa oculta
+        z1 = [sum(x[i] * W1[i][j] for i in range(2)) + b1[j] for j in range(2)]
+        a1 = [sigmoid(z1j) for z1j in z1]
 
-for epoch in range(epochs):
-    Z1, A1, Z2, A2 = forward(X, W1, b1, W2, b2)
-    loss = compute_loss(y, A2)
-    W1, b1, W2, b2 = backward(X, y, Z1, A1, Z2, A2, W1, b1, W2, b2)
-    if epoch % 100 == 0:
-        print(f"Epoch {epoch}, pérdida: {loss:.4f}")
+        # Capa de salida
+        z2 = sum(a1[i] * W2[i][0] for i in range(2)) + b2[0]
+        a2 = sigmoid(z2)  # salida final
 
-# ---------------------------
-# 5. Visualización de la frontera de decisión
-# ---------------------------
+        # === Cálculo del error ===
+        error = (y_esperado - a2) ** 2
+        error_total += error
 
-def plot_decision_boundary(X, y, W1, b1, W2, b2):
-    x_min, x_max = X[:,0].min() - 1, X[:,0].max() + 1
-    y_min, y_max = X[:,1].min() - 1, X[:,1].max() + 1
-    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 200),
-                         np.linspace(y_min, y_max, 200))
-    grid = np.c_[xx.ravel(), yy.ravel()]
-    _, _, _, probs = forward(grid, W1, b1, W2, b2)
-    probs = probs.reshape(xx.shape)
-    plt.contourf(xx, yy, probs, levels=[0, 0.5, 1], alpha=0.2, colors=['blue', 'red'])
-    plt.scatter(X[:,0], X[:,1], c=y, cmap='bwr', edgecolors='k')
-    plt.title("Frontera de decisión aprendida")
-    plt.xlabel("Característica 1")
-    plt.ylabel("Característica 2")
-    plt.show()
+        # === Backpropagation ===
+        # Derivada del error respecto a la salida
+        d_a2 = -(y_esperado - a2)
+        d_z2 = d_a2 * sigmoid_deriv(z2)
 
-plot_decision_boundary(X, y, W1, b1, W2, b2)
+        # Gradientes de los pesos de salida
+        for i in range(2):
+            W2[i][0] -= tasa_aprendizaje * d_z2 * a1[i]
+
+        b2[0] -= tasa_aprendizaje * d_z2
+
+        # Backpropagation a capa oculta
+        d_a1 = [d_z2 * W2[i][0] for i in range(2)]
+        d_z1 = [d_a1[j] * sigmoid_deriv(z1[j]) for j in range(2)]
+
+        for i in range(2):
+            for j in range(2):
+                W1[i][j] -= tasa_aprendizaje * d_z1[j] * x[i]
+
+        for j in range(2):
+            b1[j] -= tasa_aprendizaje * d_z1[j]
+
+    if epoca % 1000 == 0:
+        print(f"Época {epoca} - Error total: {error_total:.4f}")
+
+# === Evaluación final ===
+print("\nResultados después del entrenamiento:")
+for x in datos_entrada:
+    z1 = [sum(x[i] * W1[i][j] for i in range(2)) + b1[j] for j in range(2)]
+    a1 = [sigmoid(z1j) for z1j in z1]
+    z2 = sum(a1[i] * W2[i][0] for i in range(2)) + b2[0]
+    a2 = sigmoid(z2)
+    print(f"Entrada: {x} -> Predicción: {a2:.4f}")
