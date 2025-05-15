@@ -1,62 +1,111 @@
-# Importamos las librerías necesarias
-import tensorflow as tf
-from tensorflow.keras import layers, models
-import matplotlib.pyplot as plt
+"""
+Prácticas de Inteligencia Artificial
+Aprendizaje Profundo (Deep Learning)
+
+Este programa implementa una red neuronal simple con una capa oculta para clasificación binaria.
+El aprendizaje profundo utiliza redes neuronales con múltiples capas para modelar relaciones
+complejas en los datos. En este ejemplo, construimos y entrenamos la red desde cero usando NumPy,
+sin utilizar librerías especializadas, para entender el proceso fundamental del entrenamiento
+y la predicción en redes neuronales.
+"""
 import numpy as np
+import matplotlib.pyplot as plt
 
-def deep_learning_mnist():
-    """
-    Ejemplo básico de red neuronal profunda para clasificar dígitos del dataset MNIST.
-    """
+# ---------------------------
+# 1. Generación de datos
+# ---------------------------
 
-    # Cargamos el dataset MNIST, que ya viene dividido en train y test
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+np.random.seed(42)
 
-    # Mostramos la forma de los datos
-    print(f'Tamaño de conjunto de entrenamiento: {x_train.shape}')
-    print(f'Tamaño de conjunto de prueba: {x_test.shape}')
+n_samples = 200
 
-    # Preprocesamiento:
-    # Normalizamos los valores de píxeles (0-255) a un rango de 0 a 1 para mejor entrenamiento
-    x_train = x_train.astype('float32') / 255
-    x_test = x_test.astype('float32') / 255
+X0 = np.random.randn(n_samples//2, 2) - 1
+y0 = np.zeros(n_samples//2)
 
-    # Aplanamos las imágenes de 28x28 a vectores de 784 para la red densa
-    x_train = x_train.reshape(-1, 28 * 28)
-    x_test = x_test.reshape(-1, 28 * 28)
+X1 = np.random.randn(n_samples//2, 2) + 1
+y1 = np.ones(n_samples//2)
 
-    # Definimos el modelo secuencial: varias capas densas (fully connected)
-    model = models.Sequential([
-        layers.Dense(512, activation='relu', input_shape=(784,)),  # Primera capa oculta con 512 neuronas y activación ReLU
-        layers.Dense(256, activation='relu'),                      # Segunda capa oculta con 256 neuronas
-        layers.Dense(10, activation='softmax')                     # Capa de salida con 10 neuronas (una por clase), activación softmax para probabilidad
-    ])
+X = np.vstack([X0, X1])
+y = np.hstack([y0, y1])
 
-    # Compilamos el modelo:
-    # - Optimizador Adam: algoritmo para actualizar los pesos
-    # - Función de pérdida: sparse_categorical_crossentropy, adecuada para clasificación múltiple con etiquetas enteras
-    # - Métrica: accuracy para evaluar desempeño
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap='bwr', alpha=0.7)
+plt.title("Datos de entrenamiento (clases 0 y 1)")
+plt.xlabel("Característica 1")
+plt.ylabel("Característica 2")
+plt.show()
 
-    # Entrenamos el modelo con los datos de entrenamiento
-    history = model.fit(x_train, y_train,
-                        epochs=10,        # Número de épocas (iteraciones completas sobre todo el dataset)
-                        batch_size=128,   # Tamaño del lote para cada actualización
-                        validation_split=0.2)  # 20% de los datos se usan para validación durante el entrenamiento
+# ---------------------------
+# 2. Definición de la red neuronal
+# ---------------------------
 
-    # Evaluamos el modelo en el conjunto de prueba
-    test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
-    print(f'\nPrecisión en conjunto de prueba: {test_acc:.4f}')
+input_dim = 2
+hidden_dim = 4
+output_dim = 1
 
-    # Graficamos la evolución de la precisión en entrenamiento y validación
-    plt.plot(history.history['accuracy'], label='Precisión entrenamiento')
-    plt.plot(history.history['val_accuracy'], label='Precisión validación')
-    plt.xlabel('Épocas')
-    plt.ylabel('Precisión')
-    plt.legend()
+W1 = np.random.randn(input_dim, hidden_dim) * 0.01
+b1 = np.zeros(hidden_dim)
+
+W2 = np.random.randn(hidden_dim, output_dim) * 0.01
+b2 = np.zeros(output_dim)
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    return s * (1 - s)
+
+def forward(X):
+    Z1 = X.dot(W1) + b1
+    A1 = sigmoid(Z1)
+    Z2 = A1.dot(W2) + b2
+    A2 = sigmoid(Z2)
+    return Z1, A1, Z2, A2
+
+def compute_loss(y_true, y_pred):
+    m = y_true.shape[0]
+    epsilon = 1e-15
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    loss = -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+    return loss
+
+def backward(X, y, Z1, A1, Z2, A2, learning_rate=0.1):
+    m = y.shape[0]
+    dZ2 = A2 - y.reshape(-1, 1)
+    dW2 = (A1.T).dot(dZ2) / m
+    db2 = np.sum(dZ2, axis=0) / m
+    dA1 = dZ2.dot(W2.T)
+    dZ1 = dA1 * sigmoid_derivative(Z1)
+    dW1 = (X.T).dot(dZ1) / m
+    db1 = np.sum(dZ1, axis=0) / m
+    global W1, b1, W2, b2
+    W1 -= learning_rate * dW1
+    b1 -= learning_rate * db1
+    W2 -= learning_rate * dW2
+    b2 -= learning_rate * db2
+
+epochs = 1000
+
+for epoch in range(epochs):
+    Z1, A1, Z2, A2 = forward(X)
+    loss = compute_loss(y, A2)
+    backward(X, y, Z1, A1, Z2, A2)
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, pérdida: {loss:.4f}")
+
+def plot_decision_boundary(X, y):
+    x_min, x_max = X[:,0].min() - 1, X[:,0].max() + 1
+    y_min, y_max = X[:,1].min() - 1, X[:,1].max() + 1
+    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 200),
+                         np.linspace(y_min, y_max, 200))
+    grid = np.c_[xx.ravel(), yy.ravel()]
+    _, _, _, probs = forward(grid)
+    probs = probs.reshape(xx.shape)
+    plt.contourf(xx, yy, probs, levels=[0,0.5,1], alpha=0.2, colors=['blue','red'])
+    plt.scatter(X[:,0], X[:,1], c=y, cmap='bwr', edgecolors='k')
+    plt.title("Frontera de decisión aprendida")
+    plt.xlabel("Característica 1")
+    plt.ylabel("Característica 2")
     plt.show()
 
-if __name__ == "__main__":
-    deep_learning_mnist()
+plot_decision_boundary(X, y)
