@@ -60,3 +60,5 @@ print("\n--- Clasificación con SVM (núcleo RBF) ---")
 for p in pruebas:
     etiqueta = predecir(p, datos, alfas, b, kernel)
     print(f"Punto {p} => Clase predicha: {etiqueta}")
+
+#Dos núcleos disponibles: Lineal: kernel_lineal RBF/Gaussiano: kernel_rbf
