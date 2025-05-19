@@ -25,17 +25,18 @@ estado_inicial = {"en(caja, sala)", "robot_en(pasillo)", "puerta_abierta(sala)"}
 objetivo = {"en(caja, pasillo)"}
 
 # Definición de operadores (acciones)
-# Cada acción tiene:
-# - nombre
-# - precondiciones (conjunto de hechos que deben ser verdaderos para poder aplicar la acción)
-# - efectos_añadir (hechos que se agregan tras ejecutar la acción)
-# - efectos_eliminar (hechos que se eliminan tras ejecutar la acción)
 acciones = [
     {
         "nombre": "mover_robot_sala_a_pasillo",
         "precondiciones": {"robot_en(sala)", "puerta_abierta(sala)"},
         "efectos_añadir": {"robot_en(pasillo)"},
         "efectos_eliminar": {"robot_en(sala)"}
+    },
+    {
+        "nombre": "mover_robot_pasillo_a_sala",  # Acción añadida para mover robot del pasillo a la sala
+        "precondiciones": {"robot_en(pasillo)", "puerta_abierta(sala)"},
+        "efectos_añadir": {"robot_en(sala)"},
+        "efectos_eliminar": {"robot_en(pasillo)"}
     },
     {
         "nombre": "abrir_puerta_sala",
@@ -58,53 +59,20 @@ acciones = [
 ]
 
 def aplicar_accion(estado, accion):
-    """
-    Aplica una acción al estado dado si se cumplen las precondiciones.
-
-    Args:
-        estado (set): conjunto de hechos verdaderos actuales.
-        accion (dict): diccionario con la acción a aplicar.
-
-    Returns:
-        nuevo_estado (set): nuevo conjunto de hechos tras aplicar la acción,
-                           o None si no se cumplen precondiciones.
-    """
-    # Comprobar si todas las precondiciones están en el estado actual
     if not accion["precondiciones"].issubset(estado):
-        return None  # No se puede aplicar la acción
-
+        return None
     nuevo_estado = deepcopy(estado)
-
-    # Eliminar hechos indicados
     nuevo_estado.difference_update(accion["efectos_eliminar"])
-    # Añadir nuevos hechos
     nuevo_estado.update(accion["efectos_añadir"])
-
     return nuevo_estado
 
 def planificar(estado_actual, objetivo, acciones, plan=[]):
-    """
-    Algoritmo de planificación recursivo tipo STRIPS para encontrar
-    una secuencia de acciones que lleve del estado_actual al objetivo.
-
-    Args:
-        estado_actual (set): conjunto de hechos verdaderos en el estado actual.
-        objetivo (set): conjunto de hechos que deben ser verdaderos al final.
-        acciones (list): lista de acciones disponibles.
-        plan (list): lista de acciones ya seleccionadas (para seguimiento).
-
-    Returns:
-        list: secuencia de nombres de acciones que logran el objetivo, o
-              None si no se encuentra ningún plan.
-    """
-    # Caso base: si el objetivo está satisfecho, retornar el plan actual
     if objetivo.issubset(estado_actual):
         return plan
-
     for accion in acciones:
         nuevo_estado = aplicar_accion(estado_actual, accion)
         if nuevo_estado is not None:
-            # Evitar ciclos: no repetir el mismo estado en el plan
+            # Evitar ciclos
             if nuevo_estado not in [p[1] for p in plan]:
                 resultado = planificar(nuevo_estado, objetivo, acciones, plan + [(accion["nombre"], nuevo_estado)])
                 if resultado is not None:
