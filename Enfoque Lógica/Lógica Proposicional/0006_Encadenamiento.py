@@ -109,3 +109,7 @@ print("\nEncadenamiento hacia atrás para demostrar la meta:", meta_objetivo)
 resultado = encadenamiento_atras(meta_objetivo, hechos_iniciales, reglas)
 
 print("\n¿Meta lograda? =>", resultado)
+
+#Construye hechos nuevos a partir de los existentes aplicando reglas, sin necesidad de repetir.
+#Evalúa si una meta puede demostrarse usando las reglas dadas, recorriendo hacia atrás.
+#Es muy útil para representar razonamientos lógicos en sistemas expertos básicos.
