@@ -3,29 +3,14 @@ Prácticas de Inteligencia Artificial
 Enfoque: Lógica
 Subtema: Otras Lógicas – Lógica Difusa
 
-Este programa integra tres conceptos clave de la lógica difusa:
-
-1. Conjuntos Difusos:
-   Se definen funciones de pertenencia que devuelven un grado entre 0 y 1.
-   Por ejemplo, la temperatura 15°C puede pertenecer en 0.5 al conjunto "frío".
-
-2. Inferencia Difusa:
-   Se aplican reglas lógicas difusas del tipo:
-   - SI temperatura ES fría ENTONCES calefacción ES alta
-   - SI temperatura ES caliente ENTONCES calefacción ES baja
-
-   Se usa un método tipo Mamdani con reglas simples para inferir la salida.
-
-3. Fuzzy CLIPS (simulado):
-   No se usa el motor real de CLIPS, pero se simula un sistema de reglas
-   con conjuntos difusos y salidas aproximadas.
-
-Todo implementado en Python puro, sin módulos externos.
+Este programa integra y muestra por separado los tres subtemas:
+1. Conjuntos Difusos
+2. Inferencia Difusa
+3. Fuzzy CLIPS (simulado en Python puro)
 """
 
 # ---------- 1. CONJUNTOS DIFUSOS ----------
 
-# Función de pertenencia difusa para "frío"
 def frio(x):
     if x <= 10:
         return 1.0
@@ -34,7 +19,6 @@ def frio(x):
     else:
         return 0.0
 
-# Función de pertenencia difusa para "caliente"
 def caliente(x):
     if x <= 20:
         return 0.0
@@ -43,7 +27,6 @@ def caliente(x):
     else:
         return 1.0
 
-# Función de pertenencia para "calefacción alta"
 def calef_alta(x):
     if x <= 5:
         return 1.0
@@ -52,7 +35,6 @@ def calef_alta(x):
     else:
         return 0.0
 
-# Función de pertenencia para "calefacción baja"
 def calef_baja(x):
     if x <= 0:
         return 0.0
@@ -63,44 +45,63 @@ def calef_baja(x):
 
 # ---------- 2. INFERENCIA DIFUSA ----------
 
-# Sistema difuso tipo Mamdani simplificado
 def inferir_calefaccion(temp):
-    # Grado de pertenencia a los conjuntos
     grado_frio = frio(temp)
     grado_caliente = caliente(temp)
 
-    # Reglas difusas:
-    # 1) SI temperatura ES fría → calefacción alta
-    # 2) SI temperatura ES caliente → calefacción baja
+    calef_alta_salida = grado_frio
+    calef_baja_salida = grado_caliente
 
-    # Inferencia: combinar mínimos
-    calef_alta_salida = grado_frio  # activación de la regla 1
-    calef_baja_salida = grado_caliente  # activación de la regla 2
-
-    # Agregación: promedio ponderado (método del centroide simplificado)
     salida_total = (
-        calef_alta_salida * 8 +  # centro de "alta" es 8
-        calef_baja_salida * 2    # centro de "baja" es 2
+        calef_alta_salida * 8 +
+        calef_baja_salida * 2
     )
     suma_grados = calef_alta_salida + calef_baja_salida
 
     if suma_grados == 0:
-        return 0  # no se activa ninguna regla
+        return 0
     return salida_total / suma_grados
 
 # ---------- 3. "Fuzzy CLIPS" SIMULADO ----------
 
-def fuzzy_motor(temp):
-    print(f"\n💡 Temperatura actual: {temp}°C")
-    print(f"- Grado de 'frío': {frio(temp):.2f}")
-    print(f"- Grado de 'caliente': {caliente(temp):.2f}")
+def fuzzy_clips_simulado(temp):
+    reglas = []
 
-    resultado = inferir_calefaccion(temp)
-    print(f"🔥 Nivel de calefacción recomendado (0-10): {resultado:.2f}")
+    if frio(temp) > 0.0:
+        reglas.append("SI temperatura ES fría ENTONCES calefacción ES alta")
+    if caliente(temp) > 0.0:
+        reglas.append("SI temperatura ES caliente ENTONCES calefacción ES baja")
+
+    return reglas
+
+# ---------- FUNCIÓN GENERAL ----------
+
+def mostrar_todo(temp):
+    print(f"\n🌡️  Temperatura actual: {temp}°C")
+    
+    # 1. Conjuntos Difusos
+    print("\n📘 1. Conjuntos Difusos:")
+    print(f" - Pertenencia a 'frío': {frio(temp):.2f}")
+    print(f" - Pertenencia a 'caliente': {caliente(temp):.2f}")
+
+    # 2. Inferencia Difusa
+    print("\n📗 2. Inferencia Difusa:")
+    salida = inferir_calefaccion(temp)
+    print(f" - Nivel de calefacción inferido: {salida:.2f} (rango 0 a 10)")
+
+    # 3. Fuzzy CLIPS simulado
+    print("\n📙 3. Reglas Fuzzy CLIPS activadas:")
+    reglas = fuzzy_clips_simulado(temp)
+    if reglas:
+        for r in reglas:
+            print(f"   ✅ {r}")
+    else:
+        print("   ❌ No se activó ninguna regla.")
 
 # ---------- PRUEBAS ----------
 
-print("Simulación de lógica difusa para control de calefacción")
+print("Sistema de Control Difuso: Temperatura → Calefacción")
 print("=" * 60)
-for temperatura in [5, 10, 15, 20, 25, 30, 35]:
-    fuzzy_motor(temperatura)
+for t in [5, 15, 25, 35]:
+    mostrar_todo(t)
+    print("-" * 60)
